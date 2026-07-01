@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google Ads Health Checker — Diagnóstico Gratuito</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --blue: #1A73E8;
+    --blue-dark: #0D47A1;
+    --blue-light: #EFF6FF;
+    --green: #10B981;
+    --green-light: #ECFDF5;
+    --yellow: #F59E0B;
+    --yellow-light: #FFFBEB;
+    --red: #EF4444;
+    --red-light: #FEF2F2;
+    --dark: #111827;
+    --gray: #6B7280;
+    --light: #F9FAFB;
+    --border: #E5E7EB;
+    --white: #FFFFFF;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--light);
+    color: var(--dark);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, #1A73E8, #0D47A1);
+    padding: 60px 24px 80px;
+    text-align: center;
+  }
+
+  .header-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+
+  .header h1 {
+    font-size: 42px;
+    font-weight: 800;
+    color: white;
+    line-height: 1.15;
+    margin-bottom: 14px;
+  }
+
+  .header h1 span { color: #93C5FD; }
+
+  .header p {
+    font-size: 16px;
+    color: rgba(255,255,255,0.75);
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  /* ── MAIN ── */
+  .main {
+    max-width: 760px;
+    margin: -40px auto 60px;
+    padding: 0 16px;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .card-header {
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .card-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    background: var(--blue-light);
+  }
+
+  .card-header h2 {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .card-header p {
+    font-size: 12px;
+    color: var(--gray);
+    margin-top: 1px;
+  }
+
+  .card-body { padding: 24px 28px; }
+
+  /* ── CAMPAIGN TYPE ── */
+  .type-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+
+  .type-btn {
+    border: 2px solid var(--border);
+    background: white;
+    border-radius: 10px;
+    padding: 12px 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .type-btn:hover { border-color: var(--blue); background: var(--blue-light); }
+  .type-btn.active { border-color: var(--blue); background: var(--blue-light); }
+
+  .type-btn .emoji { font-size: 22px; display: block; margin-bottom: 5px; }
+  .type-btn .label { font-size: 11px; font-weight: 600; color: var(--dark); }
+
+  /* ── METRICS GRID ── */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .metric-field { }
+
+  .metric-field label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 6px;
+  }
+
+  .metric-field label .hint {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--gray);
+  }
+
+  .input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .input-wrap input {
+    width: 100%;
+    padding: 10px 36px 10px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    color: var(--dark);
+    transition: border 0.2s;
+    background: white;
+  }
+
+  .input-wrap input:focus {
+    outline: none;
+    border-color: var(--blue);
+  }
+
+  .input-unit {
+    position: absolute;
+    right: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray);
+    pointer-events: none;
+  }
+
+  .tooltip {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background: var(--border);
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--gray);
+    text-align: center;
+    line-height: 16px;
+    cursor: help;
+    position: relative;
+  }
+
+  /* ── SUBMIT ── */
+  .btn-analyze {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #1A73E8, #0D47A1);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    margin-top: 8px;
+  }
+
+  .btn-analyze:hover { opacity: 0.92; transform: translateY(-1px); }
+  .btn-analyze:active { transform: translateY(0); }
+
+  /* ── RESULTS (hidden by default) ── */
+  #results { display: none; }
+
+  /* ── SCORE HERO ── */
+  .score-hero {
+    text-align: center;
+    padding: 36px 28px 28px;
+    background: linear-gradient(135deg, #1A73E8, #0D47A1);
+    border-radius: 16px;
+    margin-bottom: 20px;
+    color: white;
+  }
+
+  .score-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.65);
+    margin-bottom: 8px;
+  }
+
+  .score-number {
+    font-size: 96px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .score-number.green { color: #6EE7B7; }
+  .score-number.yellow { color: #FCD34D; }
+  .score-number.red { color: #FCA5A5; }
+
+  .score-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .score-sub {
+    font-size: 14px;
+    color: rgba(255,255,255,0.7);
+  }
+
+  /* ── METRIC RESULTS ── */
+  .metric-result {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .metric-result:last-child { border-bottom: none; }
+
+  .metric-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .metric-dot.green { background: var(--green); }
+  .metric-dot.yellow { background: var(--yellow); }
+  .metric-dot.red { background: var(--red); }
+
+  .metric-result-info { flex: 1; }
+
+  .metric-result-name {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  .metric-result-detail {
+    font-size: 11px;
+    color: var(--gray);
+  }
+
+  .metric-result-value {
+    text-align: right;
+  }
+
+  .metric-result-score {
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .metric-result-score.green { color: var(--green); }
+  .metric-result-score.yellow { color: var(--yellow); }
+  .metric-result-score.red { color: var(--red); }
+
+  .metric-result-bench {
+    font-size: 10px;
+    color: var(--gray);
+  }
+
+  /* ── PROGRESS BAR ── */
+  .bar-wrap {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    margin-top: 6px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.8s ease;
+  }
+
+  .bar-fill.green { background: var(--green); }
+  .bar-fill.yellow { background: var(--yellow); }
+  .bar-fill.red { background: var(--red); }
+
+  /* ── ISSUES ── */
+  .issue-item {
+    display: flex;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
+
+  .issue-item.red { background: var(--red-light); }
+  .issue-item.yellow { background: var(--yellow-light); }
+  .issue-item.green { background: var(--green-light); }
+
+  .issue-icon { font-size: 20px; flex-shrink: 0; }
+
+  .issue-title {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 3px;
+  }
+
+  .issue-title.red { color: #991B1B; }
+  .issue-title.yellow { color: #92400E; }
+  .issue-title.green { color: #065F46; }
+
+  .issue-desc {
+    font-size: 12px;
+    color: var(--gray);
+    line-height: 1.5;
+  }
+
+  /* ── CTA CARDS ── */
+  .cta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .cta-card {
+    border-radius: 12px;
+    padding: 22px;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .cta-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+
+  .cta-card.primary {
+    background: linear-gradient(135deg, #1A73E8, #0D47A1);
+    color: white;
+  }
+
+  .cta-card.secondary {
+    background: var(--dark);
+    color: white;
+  }
+
+  .cta-card .cta-icon { font-size: 28px; margin-bottom: 10px; display: block; }
+
+  .cta-card .cta-price {
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+
+  .cta-card .cta-title {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .cta-card .cta-desc {
+    font-size: 11px;
+    opacity: 0.75;
+    line-height: 1.5;
+  }
+
+  .cta-card .cta-btn {
+    display: inline-block;
+    margin-top: 14px;
+    padding: 8px 20px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center;
+    padding: 24px;
+    color: var(--gray);
+    font-size: 12px;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 560px) {
+    .header h1 { font-size: 28px; }
+    .metrics-grid { grid-template-columns: 1fr; }
+    .type-grid { grid-template-columns: repeat(2, 1fr); }
+    .cta-grid { grid-template-columns: 1fr; }
+    .score-number { font-size: 72px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-badge">🩺 Herramienta gratuita</div>
+  <h1>Google Ads<br><span>Health Checker</span></h1>
+  <p>Ingresá tus métricas y descubrí en segundos qué tan saludable está tu cuenta — y qué necesita mejorar.</p>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- FORM -->
+  <div id="form-section">
+
+    <!-- Tipo de campaña -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">📁</div>
+        <div>
+          <h2>Tipo de campaña principal</h2>
+          <p>Seleccioná el tipo que más presupuesto consume en tu cuenta</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="type-grid">
+          <button class="type-btn active" onclick="selectType('search', this)">
+            <span class="emoji">🔍</span>
+            <span class="label">Search</span>
+          </button>
+          <button class="type-btn" onclick="selectType('pmax', this)">
+            <span class="emoji">⚡</span>
+            <span class="label">PMax</span>
+          </button>
+          <button class="type-btn" onclick="selectType('display', this)">
+            <span class="emoji">🖼️</span>
+            <span class="label">Display</span>
+          </button>
+          <button class="type-btn" onclick="selectType('shopping', this)">
+            <span class="emoji">🛒</span>
+            <span class="label">Shopping</span>
+          </button>
+          <button class="type-btn" onclick="selectType('video', this)">
+            <span class="emoji">▶️</span>
+            <span class="label">Video</span>
+          </button>
+          <button class="type-btn" onclick="selectType('app', this)">
+            <span class="emoji">📱</span>
+            <span class="label">App</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Métricas -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">📊</div>
+        <div>
+          <h2>Tus métricas actuales</h2>
+          <p>Usá datos de los últimos 30 días para un diagnóstico preciso</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="metrics-grid">
+
+          <div class="metric-field">
+            <label>CTR <span class="hint">Click-through rate</span></label>
+            <div class="input-wrap">
+              <input type="number" id="ctr" placeholder="3.2" step="0.1" min="0" max="100">
+              <span class="input-unit">%</span>
+            </div>
+          </div>
+
+          <div class="metric-field" id="qs-field">
+            <label>Quality Score <span class="hint">Promedio keywords</span></label>
+            <div class="input-wrap">
+              <input type="number" id="qs" placeholder="7" step="1" min="1" max="10">
+              <span class="input-unit">/10</span>
+            </div>
+          </div>
+
+          <div class="metric-field">
+            <label>Tasa de Conversión</label>
+            <div class="input-wrap">
+              <input type="number" id="cvr" placeholder="4.5" step="0.1" min="0">
+              <span class="input-unit">%</span>
+            </div>
+          </div>
+
+          <div class="metric-field">
+            <label>CPA <span class="hint">Costo por conversión</span></label>
+            <div class="input-wrap">
+              <input type="number" id="cpa" placeholder="25" step="1" min="0">
+              <span class="input-unit">$</span>
+            </div>
+          </div>
+
+          <div class="metric-field">
+            <label>Impression Share <span class="hint">% impresiones capturadas</span></label>
+            <div class="input-wrap">
+              <input type="number" id="is" placeholder="65" step="1" min="0" max="100">
+              <span class="input-unit">%</span>
+            </div>
+          </div>
+
+          <div class="metric-field">
+            <label>IS perdido por presupuesto</label>
+            <div class="input-wrap">
+              <input type="number" id="is_lost" placeholder="12" step="1" min="0" max="100">
+              <span class="input-unit">%</span>
+            </div>
+          </div>
+
+          <div class="metric-field">
+            <label>ROAS <span class="hint">Retorno sobre inversión</span></label>
+            <div class="input-wrap">
+              <input type="number" id="roas" placeholder="4.2" step="0.1" min="0">
+              <span class="input-unit">x</span>
+            </div>
+          </div>
+
+          <div class="metric-field">
+            <label>Presupuesto utilizado <span class="hint">% del presupuesto diario</span></label>
+            <div class="input-wrap">
+              <input type="number" id="budget_util" placeholder="85" step="1" min="0" max="100">
+              <span class="input-unit">%</span>
+            </div>
+          </div>
+
+        </div>
+
+        <button class="btn-analyze" onclick="analyze()">
+          🔍 Analizar mi cuenta ahora
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /form-section -->
+
+  <!-- RESULTS -->
+  <div id="results">
+
+    <!-- Score hero -->
+    <div class="score-hero">
+      <div class="score-label">Salud de tu cuenta</div>
+      <div class="score-number" id="score-num">0</div>
+      <div class="score-title" id="score-title">—</div>
+      <div class="score-sub" id="score-sub">—</div>
+    </div>
+
+    <!-- Breakdown por métrica -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">📈</div>
+        <div>
+          <h2>Diagnóstico por métrica</h2>
+          <p>Análisis individual de cada indicador</p>
+        </div>
+      </div>
+      <div class="card-body" id="metrics-breakdown"></div>
+    </div>
+
+    <!-- Top issues / wins -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">🎯</div>
+        <div>
+          <h2>Prioridades de acción</h2>
+          <p>Lo que necesitás atender primero</p>
+        </div>
+      </div>
+      <div class="card-body" id="issues-list"></div>
+    </div>
+
+    <!-- CTAs -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">🚀</div>
+        <div>
+          <h2>¿Querés mejorar estos resultados?</h2>
+          <p>Recursos y ayuda directa de un especialista</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="cta-grid">
+          <a href="https://gumroad.com" target="_blank" class="cta-card primary">
+            <span class="cta-icon">📋</span>
+            <div class="cta-price">$29</div>
+            <div class="cta-title">Campaign Structure Template</div>
+            <div class="cta-desc">Guía completa + templates listos para usar. Jerarquía, naming, briefing y checklist de lanzamiento.</div>
+            <span class="cta-btn">Descargar ahora →</span>
+          </a>
+          <a href="mailto:aperezreyes.jp@gmail.com?subject=Auditoría Google Ads" class="cta-card secondary">
+            <span class="cta-icon">🔬</span>
+            <div class="cta-price">$99</div>
+            <div class="cta-title">Auditoría Profesional</div>
+            <div class="cta-desc">Revisión completa de tu cuenta con recomendaciones específicas y plan de acción. 48hs de entrega.</div>
+            <span class="cta-btn">Agendar auditoría →</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Volver -->
+    <div style="text-align:center;margin-bottom:20px;">
+      <button onclick="reset()" style="background:none;border:1.5px solid var(--border);padding:10px 24px;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--gray);cursor:pointer;">← Analizar otra cuenta</button>
+    </div>
+
+  </div><!-- /results -->
+
+</div><!-- /main -->
+
+<div class="footer">
+  Google Ads Health Checker · Herramienta gratuita de diagnóstico · No se almacenan tus datos
+</div>
+
+<script>
+  let campaignType = 'search';
+
+  function selectType(type, btn) {
+    campaignType = type;
+    document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    // Mostrar/ocultar Quality Score según tipo
+    const qsField = document.getElementById('qs-field');
+    qsField.style.opacity = (type === 'search') ? '1' : '0.4';
+  }
+
+  // ── BENCHMARKS por tipo de campaña ──
+  const BENCHMARKS = {
+    search:   { ctr: [1, 3, 99],    qs: [5, 7, 10],  cvr: [1, 3, 99],   cpa: 'lower', is: [30, 60, 100], is_lost: [0, 20, 100], roas: [2, 4, 99], budget: [60, 85, 100] },
+    pmax:     { ctr: [0.5, 2, 99],  qs: null,         cvr: [1, 3, 99],   cpa: 'lower', is: [30, 60, 100], is_lost: [0, 20, 100], roas: [3, 5, 99], budget: [70, 90, 100] },
+    display:  { ctr: [0.1, 0.35, 99], qs: null,       cvr: [0.3, 1, 99], cpa: 'lower', is: [20, 50, 100], is_lost: [0, 25, 100], roas: [1, 3, 99], budget: [60, 85, 100] },
+    shopping: { ctr: [0.5, 1.5, 99], qs: null,        cvr: [1, 3, 99],   cpa: 'lower', is: [30, 60, 100], is_lost: [0, 20, 100], roas: [3, 6, 99], budget: [70, 90, 100] },
+    video:    { ctr: [0.3, 1, 99],  qs: null,         cvr: [0.2, 0.8, 99], cpa: 'lower', is: [20, 50, 100], is_lost: [0, 30, 100], roas: [1, 3, 99], budget: [60, 85, 100] },
+    app:      { ctr: [0.3, 1, 99],  qs: null,         cvr: [1, 4, 99],   cpa: 'lower', is: [20, 50, 100], is_lost: [0, 25, 100], roas: [2, 4, 99], budget: [70, 90, 100] },
+  };
+
+  function scoreMetric(value, benchmarks, inverted) {
+    if (value === null || value === '') return null;
+    const [low, mid] = benchmarks;
+    if (inverted) {
+      if (value <= low) return { score: 95, color: 'green' };
+      if (value <= mid) return { score: 55, color: 'yellow' };
+      return { score: 20, color: 'red' };
+    } else {
+      if (value >= mid) return { score: 95, color: 'green' };
+      if (value >= low) return { score: 55, color: 'yellow' };
+      return { score: 20, color: 'red' };
+    }
+  }
+
+  function analyze() {
+    const b = BENCHMARKS[campaignType];
+    const ctr      = parseFloat(document.getElementById('ctr').value);
+    const qs       = parseFloat(document.getElementById('qs').value);
+    const cvr      = parseFloat(document.getElementById('cvr').value);
+    const cpa      = parseFloat(document.getElementById('cpa').value);
+    const is       = parseFloat(document.getElementById('is').value);
+    const is_lost  = parseFloat(document.getElementById('is_lost').value);
+    const roas     = parseFloat(document.getElementById('roas').value);
+    const budget   = parseFloat(document.getElementById('budget_util').value);
+
+    // ── SCORE cada métrica ──
+    const results = [];
+
+    if (!isNaN(ctr)) {
+      const r = scoreMetric(ctr, b.ctr, false);
+      results.push({ name: 'CTR', value: ctr + '%', ...r,
+        bench: `Benchmark: >${b.ctr[1]}%`,
+        tip: r.color === 'red' ? 'Tu CTR está bajo. Revisá titulares de anuncios y relevancia de keywords.' :
+             r.color === 'yellow' ? 'CTR aceptable. Optimizá titulares con propuesta de valor más clara.' :
+             'Excelente CTR. Tus anuncios son relevantes para la audiencia.' });
+    }
+
+    if (!isNaN(qs) && campaignType === 'search') {
+      const r = scoreMetric(qs, b.qs, false);
+      results.push({ name: 'Quality Score', value: qs + '/10', ...r,
+        bench: `Benchmark: ≥${b.qs[1]}`,
+        tip: r.color === 'red' ? 'QS bajo aumenta tu CPC hasta 400%. Mejorá relevancia keyword-anuncio-landing.' :
+             r.color === 'yellow' ? 'QS mejorable. Alineá mejor los anuncios con la intención de búsqueda.' :
+             'Excelente Quality Score. Estás pagando menos que tus competidores.' });
+    }
+
+    if (!isNaN(cvr)) {
+      const r = scoreMetric(cvr, b.cvr, false);
+      results.push({ name: 'Tasa de Conversión', value: cvr + '%', ...r,
+        bench: `Benchmark: >${b.cvr[1]}%`,
+        tip: r.color === 'red' ? 'CVR muy bajo. El problema puede estar en la landing page, no en los anuncios.' :
+             r.color === 'yellow' ? 'CVR aceptable. A/B testea la landing page para mejorar.' :
+             'Excelente tasa de conversión. Tu landing page está convirtiendo bien.' });
+    }
+
+    if (!isNaN(is)) {
+      const r = scoreMetric(is, b.is, false);
+      results.push({ name: 'Impression Share', value: is + '%', ...r,
+        bench: `Benchmark: >${b.is[1]}%`,
+        tip: r.color === 'red' ? 'Estás perdiendo muchas impresiones. Revisá presupuesto y Ad Rank.' :
+             r.color === 'yellow' ? 'IS moderado. Hay oportunidad de capturar más mercado.' :
+             'Buen nivel de IS. Estás bien posicionado en las subastas.' });
+    }
+
+    if (!isNaN(is_lost)) {
+      const r = scoreMetric(is_lost, b.is_lost, true);
+      results.push({ name: 'IS Perdido por Presupuesto', value: is_lost + '%', ...r,
+        bench: `Benchmark: <${b.is_lost[1]}%`,
+        tip: r.color === 'red' ? 'Estás perdiendo muchas impresiones por presupuesto limitado. Redistribuí o aumentá.' :
+             r.color === 'yellow' ? 'Pérdida moderada. Considerá ajustar la programación de anuncios.' :
+             'Buena eficiencia de presupuesto. No estás perdiendo subastas por dinero.' });
+    }
+
+    if (!isNaN(roas)) {
+      const r = scoreMetric(roas, b.roas, false);
+      results.push({ name: 'ROAS', value: roas + 'x', ...r,
+        bench: `Benchmark: >${b.roas[1]}x`,
+        tip: r.color === 'red' ? 'ROAS bajo. Revisá targeting, pujas y calidad de los productos/servicios anunciados.' :
+             r.color === 'yellow' ? 'ROAS aceptable pero mejorable. Optimizá las pujas por producto/campaña.' :
+             'Excelente ROAS. Tu inversión está generando retorno sólido.' });
+    }
+
+    if (!isNaN(budget)) {
+      const r = scoreMetric(budget, b.budget, false);
+      results.push({ name: 'Utilización de Presupuesto', value: budget + '%', ...r,
+        bench: `Benchmark: ${b.budget[0]}-${b.budget[1]}%`,
+        tip: r.color === 'red' ? 'Presupuesto subutilizado. Revisá targeting y horarios de publicación.' :
+             r.color === 'yellow' ? 'Utilización aceptable. Revisá si hay momentos del día sin entregar.' :
+             'Buena utilización de presupuesto. Las campañas están entregando consistentemente.' });
+    }
+
+    if (results.length === 0) {
+      alert('Ingresá al menos una métrica para analizar.');
+      return;
+    }
+
+    // ── CALCULAR SCORE TOTAL ──
+    const avg = Math.round(results.reduce((s, r) => s + r.score, 0) / results.length);
+
+    // ── MOSTRAR RESULTADOS ──
+    document.getElementById('form-section').style.display = 'none';
+    document.getElementById('results').style.display = 'block';
+
+    // Score hero
+    const scoreEl = document.getElementById('score-num');
+    scoreEl.textContent = avg;
+    let scoreColor, scoreTitle, scoreSub;
+    if (avg >= 75) {
+      scoreColor = 'green';
+      scoreTitle = '🟢 Cuenta saludable';
+      scoreSub = 'Tus métricas están en buen rango. Hay oportunidades de optimización para llevarla al siguiente nivel.';
+    } else if (avg >= 45) {
+      scoreColor = 'yellow';
+      scoreTitle = '🟡 Necesita atención';
+      scoreSub = 'Tu cuenta tiene áreas críticas que están afectando el rendimiento y el gasto. Actuá pronto.';
+    } else {
+      scoreColor = 'red';
+      scoreTitle = '🔴 Cuenta en riesgo';
+      scoreSub = 'Varias métricas están por debajo del benchmark. Estás perdiendo dinero. Necesitás una revisión urgente.';
+    }
+    scoreEl.className = 'score-number ' + scoreColor;
+    document.getElementById('score-title').textContent = scoreTitle;
+    document.getElementById('score-sub').textContent = scoreSub;
+
+    // Animate score
+    let current = 0;
+    const target = avg;
+    const interval = setInterval(() => {
+      current = Math.min(current + 2, target);
+      scoreEl.textContent = current;
+      if (current >= target) clearInterval(interval);
+    }, 16);
+
+    // Métricas breakdown
+    const breakdown = document.getElementById('metrics-breakdown');
+    breakdown.innerHTML = results.map(r => `
+      <div class="metric-result">
+        <div class="metric-dot ${r.color}"></div>
+        <div class="metric-result-info">
+          <div class="metric-result-name">${r.name}</div>
+          <div class="metric-result-detail">${r.bench}</div>
+          <div class="bar-wrap"><div class="bar-fill ${r.color}" style="width:${r.score}%"></div></div>
+        </div>
+        <div class="metric-result-value">
+          <div class="metric-result-score ${r.color}">${r.value}</div>
+          <div class="metric-result-bench">score ${r.score}/100</div>
+        </div>
+      </div>
+    `).join('');
+
+    // Issues / priorities
+    const sorted = [...results].sort((a, b) => a.score - b.score);
+    const issues = document.getElementById('issues-list');
+    const iconMap = { red: '🚨', yellow: '⚠️', green: '✅' };
+    issues.innerHTML = sorted.slice(0, 4).map(r => `
+      <div class="issue-item ${r.color}">
+        <div class="issue-icon">${iconMap[r.color]}</div>
+        <div>
+          <div class="issue-title ${r.color}">${r.name}: ${r.value}</div>
+          <div class="issue-desc">${r.tip}</div>
+        </div>
+      </div>
+    `).join('');
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function reset() {
+    document.getElementById('form-section').style.display = 'block';
+    document.getElementById('results').style.display = 'none';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
